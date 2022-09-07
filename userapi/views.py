@@ -259,87 +259,109 @@ def createTables(request):
         )
         post4.save()
 
-        postID = Post.objects.get(user_id = user1.userID).postID
+        post = Post.objects.get(user_id = user1.userID)
         comment1 = Comment.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user3.userID,
             body = "We can also comment. Haha!",
             timestamp = int(time.time())
         )
         comment1.save()
+        post.numComments += 1
+        post.save()
 
         comment2 = Comment.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user2.userID,
             body = "Like, unlike works tooooo.",
             timestamp = int(time.time())
         )
         comment2.save()
+        post.numComments += 1
+        post.save()
 
-        postID = Post.objects.get(user_id = user2.userID).postID
+        post = Post.objects.get(user_id = user2.userID)
         comment3 = Comment.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user4.userID,
             body = "Heaven onlyyyy",
             timestamp = int(time.time())
         )
         comment3.save()
+        post.numComments += 1
+        post.save()
 
-        postID = Post.objects.get(user_id = user3.userID).postID
+        post = Post.objects.get(user_id = user3.userID)
         comment4 = Comment.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user4.userID,
             body = "Insightful.",
             timestamp = int(time.time())
         )
         comment4.save()
+        post.numComments += 1
+        post.save()
 
-        postID = Post.objects.get(user_id = user4.userID).postID
+        post = Post.objects.get(user_id = user4.userID)
         postLikes1 = PostLikes.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user1.userID
         )
         postLikes1.save()
+        post.numLikes += 1
+        post.save()
 
         postLikes2 = PostLikes.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user2.userID
         )
         postLikes2.save()
+        post.numLikes += 1
+        post.save()
 
         postLikes3 = PostLikes.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user3.userID
         )
         postLikes3.save()
+        post.numLikes += 1
+        post.save()
 
-        postID = Post.objects.get(user_id = user2.userID).postID
+        post = Post.objects.get(user_id = user2.userID)
         postLikes4 = PostLikes.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user4.userID
         )
         postLikes4.save()
+        post.numLikes += 1
+        post.save()
 
-        postID = Post.objects.get(user_id = user3.userID).postID
+        post = Post.objects.get(user_id = user3.userID)
         postLikes5 = PostLikes.objects.create(
-            post_id = postID,
+            post_id = post.postID,
             user_id = user1.userID
         )
         postLikes5.save()
+        post.numLikes += 1
+        post.save()
 
-        commentID = Comment.objects.get(body = "Like, unlike works tooooo.").commentID
+        comment = Comment.objects.get(body = "Like, unlike works tooooo.")
         commentLikes1 = CommentLikes.objects.create(
-            comment_id = commentID,
+            comment_id = comment.commentID,
             user_id = user1.userID
         )
         commentLikes1.save()
+        comment.numLikes += 1
+        comment.save()
 
-        commentID = Comment.objects.get(body = "Heaven onlyyyy").commentID
+        comment = Comment.objects.get(body = "Heaven onlyyyy")
         commentLikes2 = CommentLikes.objects.create(
-            comment_id = commentID,
+            comment_id = comment.commentID,
             user_id = user2.userID
         )
         commentLikes2.save()
+        comment.numLikes += 1
+        comment.save()
 
         serializer = CommentLikesSerializer(commentLikes2)
         return Response(serializer.data)
