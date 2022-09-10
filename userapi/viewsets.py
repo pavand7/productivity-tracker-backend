@@ -11,6 +11,13 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
 
+class GetUserByEmail(viewsets.ModelViewSet):
+    serializer_class = serializers.UserSerializer
+
+    def get_queryset(self):
+        email = self.kwargs['email']
+        return models.User.objects.filter(email__exact = email)
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = models.Event.objects.all()
     serializer_class = serializers.EventSerializer

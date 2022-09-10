@@ -1,9 +1,10 @@
-from userapi.viewsets import BadgeViewSet, CommentLikesViewSet, CommentViewSet, EventViewSet, FollowingViewSet, GetCommentsLikes, GetPostsComments, GetPostsLikes, GetUsersFollowing, GetUsersPosts, GetUsersDaysEvents, PostLikesViewSet, PostViewSet, UserViewSet
+from userapi.viewsets import BadgeViewSet, CommentLikesViewSet, CommentViewSet, EventViewSet, FollowingViewSet, GetCommentsLikes, GetPostsComments, GetPostsLikes, GetUserByEmail, GetUsersFollowing, GetUsersPosts, GetUsersDaysEvents, PostLikesViewSet, PostViewSet, UserViewSet
 from rest_framework import routers
 from userapi.views import likePost
 
 router = routers.DefaultRouter()
 router.register('badge', BadgeViewSet)
+router.register(r'user/(?P<email>[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+)', GetUserByEmail, 'User')
 router.register('user', UserViewSet)
 router.register(r'event/(?P<userID>\d+)/(?P<timestamp>\w+)', GetUsersDaysEvents, 'Event')
 router.register('event', EventViewSet)
