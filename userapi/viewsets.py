@@ -51,12 +51,27 @@ class FollowingViewSet(viewsets.ModelViewSet):
     queryset = models.Following.objects.all()
     serializer_class = serializers.FollowingSerializer
 
+class IdealDataViewSet(viewsets.ModelViewSet):
+    queryset = models.IdealData.objects.all()
+    serializer_class = serializers.IdealDataSerializer
+
+class ProductivityViewSet(viewsets.ModelViewSet):
+    queryset = models.Productivity.objects.all()
+    serializer_class = serializers.ProductivitySerializer
+
 class GetUsersFollowing(viewsets.ModelViewSet):
     serializer_class = serializers.FollowingSerializer
 
     def get_queryset(self):
         userID = self.kwargs['userID']
         return models.Following.objects.filter(user_id__exact = userID)
+
+class GetUsersIdealData(viewsets.ModelViewSet):
+    serializer_class = serializers.IdealDataSerializer
+
+    def get_queryset(self):
+        userID = self.kwargs['userID']
+        return models.IdealData.objects.filter(user_id__exact = userID)
 
 class GetUsersPosts(viewsets.ModelViewSet):
     serializer_class = serializers.UserPostSerializer

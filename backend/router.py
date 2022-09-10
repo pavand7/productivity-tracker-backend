@@ -1,4 +1,4 @@
-from userapi.viewsets import BadgeViewSet, CommentLikesViewSet, CommentViewSet, EventViewSet, FollowingViewSet, GetCommentsLikes, GetPostsComments, GetPostsLikes, GetUserByEmail, GetUsersFollowing, GetUsersPosts, GetUsersDaysEvents, PostLikesViewSet, PostViewSet, UserViewSet
+from userapi.viewsets import BadgeViewSet, CommentLikesViewSet, CommentViewSet, EventViewSet, FollowingViewSet, GetCommentsLikes, GetPostsComments, GetPostsLikes, GetUserByEmail, GetUsersFollowing, GetUsersIdealData, GetUsersPosts, GetUsersDaysEvents, IdealDataViewSet, PostLikesViewSet, PostViewSet, ProductivityViewSet, UserViewSet
 from rest_framework import routers
 from userapi.views import likePost
 
@@ -18,6 +18,9 @@ router.register(r'postLikes/(?P<postID>\d+)', GetPostsLikes, 'PostLikes')
 router.register(r'postComments/(?P<postID>\d+)', GetPostsComments, 'Comment')
 router.register(r'commentLikes/(?P<commentID>\d+)', GetCommentsLikes, 'CommentLikes')
 router.register('following', FollowingViewSet)
+router.register('idealData', IdealDataViewSet)
+router.register(r'userIdealData/(?P<useriD>\d+)', GetUsersIdealData, 'IdealData')
+# router.register('productivity', ProductivityViewSet)
 # router.register(r'likePost/(?P<postID>\d+)&(?P<userID>\d+)', likePost, 'like_post')
 
 # create: POST - http://localhost:8000/api/user/ with data

@@ -4,12 +4,28 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
-from userapi.models import Comment, CommentLikes, Event, Following, Post, PostLikes, User
+from userapi.models import Comment, CommentLikes, Event, Following, Post, PostLikes, Productivity, User
 from userapi.serializers import CommentLikesSerializer, CommentSerializer, PostSerializer
 
 import time
+import datetime
 import json
 # Create your views here.
+
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def getLastWeekProductivity(request, userID):
+    print(userID)
+    timestamp = time.time()
+    if request.method == "GET":
+        scores = []
+        for i in range(7):
+            date = datetime.datetime.fromtimestamp(timestamp - (7 - i) * 86400).date()
+            try:
+                scores.append(Productivity.objects.filter(user_id__exact = userID).filter(date__exact = date)[0].score)
+            except IndexError:
+                scores.append(0)
+        return Response({"scores": scores})
 
 @api_view(('POST',))
 @renderer_classes((JSONRenderer,))
@@ -131,21 +147,32 @@ def createTables(request):
         PostLikes.objects.all().delete()
         CommentLikes.objects.all().delete()
         Following.objects.all().delete()
+        Productivity.objects.all().delete()
 
         user1 = User.objects.create(
             email = "ee18b048@smail.iitm.ac.in",
             firstName = "Pavan Sairam",
             lastName = "D",
             userName = "pavand7",
-            lastWeekProductivity = [65.4, 23.7, 89.33, 100, 53.1, 34.8, 79.2]
+            
         )
         user1.save()
+        lastWeekProductivity = [65.4, 23.7, 89.33, 100, 53.1, 34.8, 79.2]
+        timestamp = int(time.time())
+        for i in range(7):
+            date = datetime.datetime.fromtimestamp(timestamp - (7-i) * 86400).date()
+            productivity = Productivity.objects.create(
+                user_id = user1.userID,
+                date = date,
+                score = lastWeekProductivity[i]
+            )
+            productivity.save()
         user2 = User.objects.create(
             email = "cs20b017@smail.iitm.ac.in",
             firstName = "Biswadip",
             lastName = "Mandal",
             userName = "b.i.s.w_a.d.i.p",
-            lastWeekProductivity = [46.5, 72.3, 93.8, 17.4, 31.5, 83.4, 27.9]
+            # lastWeekProductivity = [46.5, 72.3, 93.8, 17.4, 31.5, 83.4, 27.9]
         )
         user2.save()
         user3 = User.objects.create(
@@ -153,7 +180,7 @@ def createTables(request):
             firstName = "Chetana",
             lastName = "Nayani",
             userName = "nayanichetana003",
-            lastWeekProductivity = [54.6, 27.3, 38.9, 74.1, 15.3, 81.9, 92.7]
+            # lastWeekProductivity = [54.6, 27.3, 38.9, 74.1, 15.3, 81.9, 92.7]
         )
         user3.save()
         user4 = User.objects.create(
@@ -161,7 +188,7 @@ def createTables(request):
             firstName = "Araj",
             lastName = "Khandelwal",
             userName = "araj_khandelwal",
-            lastWeekProductivity = [64.5, 0, 98.3, 32.6, 57.2, 48.3, 88.4]
+            # lastWeekProductivity = [64.5, 0, 98.3, 32.6, 57.2, 48.3, 88.4]
         )
         user4.save()
 

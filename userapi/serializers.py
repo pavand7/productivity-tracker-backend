@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Badge, Comment, CommentLikes, Event, Following, Post, PostLikes, User
+from .models import Badge, Comment, CommentLikes, Event, Following, IdealData, Post, PostLikes, Productivity, User
 
 class BadgeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +42,16 @@ class CommentLikesSerializer(serializers.ModelSerializer):
 class FollowingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Following
+        fields = '__all__'
+
+class IdealDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdealData
+        fields = '__all__'
+
+class ProductivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Productivity
         fields = '__all__'
 
 class UserPostSerializer(serializers.ModelSerializer):
