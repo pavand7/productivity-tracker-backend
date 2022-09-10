@@ -5,10 +5,6 @@ import json
 # Create your models here.
 
 # *** Check each of the field and try to use options effectively ***
-
-def last_week_productivity_default():
-    return [-1.0] * 7
-
 class Badge(models.Model):
     badgeID = models.AutoField(primary_key=True)
     title = models.CharField(max_length = 20)
@@ -24,7 +20,6 @@ class User(models.Model):
     userName = models.CharField(unique = True, max_length = 20)
     # photo = models.ImageField(upload_to = )
     badges = models.ManyToManyField(Badge, related_name = 'users', blank = True) # many-to-many: a user can have multiple badges and a badge can be awarded to multiple users
-    lastWeekProductivity = ArrayField(size = 7, base_field = models.FloatField(), default = last_week_productivity_default)
 
 class Event(models.Model):
     eventID = models.AutoField(primary_key=True)
@@ -72,3 +67,15 @@ class CommentLikes(models.Model):
 class Following(models.Model):
     user = models.ForeignKey(User, related_name = 'following', on_delete=models.CASCADE)
     following = models.BigIntegerField()
+
+class IdealData(models.Model):
+    user = models.ForeignKey(User, related_name = 'ideal_data', on_delete=models.CASCADE)
+    sleep_time = models.IntegerField()
+    work_hours = models.IntegerField()
+    screen_time = models.IntegerField()
+    workout_hours = models.IntegerField()
+
+class Productivity(models.Model):
+    user = models.ForeignKey(User, related_name = 'productivity', on_delete=models.CASCADE)
+    date = models.CharField(max_length = 10)
+    score = models.FloatField()
