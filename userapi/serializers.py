@@ -18,9 +18,11 @@ class EventSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PostSerializer(serializers.ModelSerializer):
+    userName = serializers.CharField(source = 'user.userName')
+    # photo = serializers.CharField(source = 'user.photo')
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['postID', 'user', 'body', 'timestamp', 'numLikes', 'numComments', 'userName']
 
 class PostLikesSerializer(serializers.ModelSerializer):
     class Meta:
