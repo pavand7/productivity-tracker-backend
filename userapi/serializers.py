@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     post_likes = serializers.StringRelatedField(many = True)
     class Meta:
         model = User
-        fields = ['userID', 'email', 'firstName', 'lastName', 'isNewUser', 'userName', 'badges', 'lastWeekProductivity', 'post_likes'] # to get only few ('userID', 'firstName', etc)
+        fields = ['userID', 'email', 'firstName', 'lastName', 'isNewUser', 'userName', 'badges', 'post_likes'] # to get only few ('userID', 'firstName', etc)
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
