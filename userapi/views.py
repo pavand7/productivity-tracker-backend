@@ -172,25 +172,52 @@ def createTables(request):
             firstName = "Biswadip",
             lastName = "Mandal",
             userName = "b.i.s.w_a.d.i.p",
-            # lastWeekProductivity = [46.5, 72.3, 93.8, 17.4, 31.5, 83.4, 27.9]
         )
         user2.save()
+        lastWeekProductivity = [46.5, 72.3, 93.8, 17.4, 31.5, 83.4, 27.9]
+        timestamp = int(time.time())
+        for i in range(7):
+            date = datetime.datetime.fromtimestamp(timestamp - (7-i) * 86400).date()
+            productivity = Productivity.objects.create(
+                user_id = user2.userID,
+                date = date,
+                score = lastWeekProductivity[i]
+            )
+            productivity.save()
         user3 = User.objects.create(
             email = "cs20b055@smail.iitm.ac.in",
             firstName = "Chetana",
             lastName = "Nayani",
-            userName = "nayanichetana003",
-            # lastWeekProductivity = [54.6, 27.3, 38.9, 74.1, 15.3, 81.9, 92.7]
+            userName = "nayanichetana003"
         )
         user3.save()
+        lastWeekProductivity = [54.6, 27.3, 38.9, 74.1, 15.3, 81.9, 92.7]
+        timestamp = int(time.time())
+        for i in range(7):
+            date = datetime.datetime.fromtimestamp(timestamp - (7-i) * 86400).date()
+            productivity = Productivity.objects.create(
+                user_id = user3.userID,
+                date = date,
+                score = lastWeekProductivity[i]
+            )
+            productivity.save()
         user4 = User.objects.create(
             email = "cs20b008@smail.iitm.ac.in",
             firstName = "Araj",
             lastName = "Khandelwal",
-            userName = "araj_khandelwal",
-            # lastWeekProductivity = [64.5, 0, 98.3, 32.6, 57.2, 48.3, 88.4]
+            userName = "araj_khandelwal"
         )
         user4.save()
+        lastWeekProductivity = [64.5, 0, 98.3, 32.6, 57.2, 48.3, 88.4]
+        timestamp = int(time.time())
+        for i in range(7):
+            date = datetime.datetime.fromtimestamp(timestamp - (7-i) * 86400).date()
+            productivity = Productivity.objects.create(
+                user_id = user4.userID,
+                date = date,
+                score = lastWeekProductivity[i]
+            )
+            productivity.save()
 
         event1 = Event.objects.create(
             type = "Exercise",
