@@ -71,7 +71,7 @@ class GetUsersIdealData(viewsets.ModelViewSet):
 
     def get_queryset(self):
         userID = self.kwargs['userID']
-        return models.IdealData.objects.filter(user_id__exact = userID)
+        return models.IdealData.objects.filter(userID__exact = userID)
 
 class GetUsersPosts(viewsets.ModelViewSet):
     serializer_class = serializers.UserPostSerializer
