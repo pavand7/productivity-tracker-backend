@@ -19,7 +19,7 @@ router.register(r'postComments/(?P<postID>\d+)', GetPostsComments, 'Comment')
 router.register(r'commentLikes/(?P<commentID>\d+)', GetCommentsLikes, 'CommentLikes')
 router.register('following', FollowingViewSet)
 router.register('idealData', IdealDataViewSet)
-router.register(r'userIdealData/(?P<useriD>\d+)', GetUsersIdealData, 'IdealData')
+router.register(r'userIdealData/(?P<userID>\d+)', GetUsersIdealData, 'IdealData')
 # router.register('productivity', ProductivityViewSet)
 # router.register(r'likePost/(?P<postID>\d+)&(?P<userID>\d+)', likePost, 'like_post')
 
