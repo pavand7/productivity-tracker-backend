@@ -7,7 +7,8 @@ class BadgeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
-    post_likes = serializers.StringRelatedField(many = True)
+    # post_likes will be updated with likePost/unlikePost apis only so, read_only here
+    post_likes = serializers.StringRelatedField(many = True, read_only=True)
     class Meta:
         model = User
         fields = ['userID', 'email', 'firstName', 'lastName', 'isNewUser', 'userName', 'badges', 'post_likes'] # to get only few ('userID', 'firstName', etc)
