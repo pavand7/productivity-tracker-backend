@@ -31,6 +31,9 @@ class Event(models.Model):
     end_time = models.BigIntegerField()
     date = models.CharField(max_length = 10)
 
+    # class Meta:
+    #     unique_together = ['user', 'type', 'title', 'description', 'start_time', 'end_time', 'date']
+
 class Post(models.Model):
     postID = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, related_name = 'posts', on_delete=models.CASCADE)
@@ -38,6 +41,9 @@ class Post(models.Model):
     timestamp = models.BigIntegerField()
     numLikes = models.BigIntegerField(default = 0)
     numComments = models.BigIntegerField(default = 0)
+
+    class Meta:
+        unique_together = ['user', 'body', 'timestamp']
 
 class PostLikes(models.Model):
     post = models.ForeignKey(Post, related_name = 'likes', on_delete=models.CASCADE)
@@ -57,6 +63,9 @@ class Comment(models.Model):
     timestamp = models.BigIntegerField()
     numLikes = models.BigIntegerField(default = 0)
 
+    class Meta:
+        unique_together = ['post', 'user', 'body', 'timestamp']
+
 class CommentLikes(models.Model):
     comment = models.ForeignKey(Comment, related_name = 'likes', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name = 'comment_likes', on_delete=models.CASCADE)
@@ -68,14 +77,20 @@ class Following(models.Model):
     user = models.ForeignKey(User, related_name = 'following', on_delete=models.CASCADE)
     following = models.BigIntegerField()
 
+    class Meta:
+        unique_together = ['user', 'following']
+
 class IdealData(models.Model):
-    user = models.ForeignKey(User, related_name = 'ideal_data', on_delete=models.CASCADE)
+    userID = models.BigIntegerField(unique = True)
     sleep_time = models.IntegerField()
     work_hours = models.IntegerField()
     screen_time = models.IntegerField()
     workout_hours = models.IntegerField()
 
 class Productivity(models.Model):
-    user = models.ForeignKey(User, related_name = 'productivity', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.CharField(max_length = 10)
     score = models.FloatField()
+
+    class Meta:
+        unique_together = ['user', 'date']
