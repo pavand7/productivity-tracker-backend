@@ -3,7 +3,8 @@
 ## DOWNLOADING THE PROJECT
 - Make sure git and python are installed in your system.
 - Clone the backend github repository by running the following command in the terminal window:
- git clone https://github.com/pavand7/productivity-tracker-backend.git
+
+ `git clone https://github.com/pavand7/productivity-tracker-backend.git`
 
 
 ## INSTALLING THE PACKAGES
@@ -46,7 +47,7 @@ The DATABASES variable should look like the following:
 - In the root directory, run ‘python manage.py makemigrations’ and ‘python manage.py migrate’. These will migrate the changes in table models to the database.
 - Change ALLOWED HOSTS variable in ‘root/backend/settings.py’ file for frontend to be able to call backend apis. It should look something like this: (10.0.2.2 is the host for the emulator in android studio)
 
-**ALLOWED_HOSTS = ['10.0.2.2', 'localhost']**
+`ALLOWED_HOSTS = ['10.0.2.2', 'localhost']`
 
 ## RUNNING THE PROJECT
 
