@@ -19,6 +19,11 @@ class EventSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+class GetPostSerializer(serializers.ModelSerializer):
     userName = serializers.CharField(source = 'user.userName')
     # photo = serializers.CharField(source = 'user.photo')
     class Meta:

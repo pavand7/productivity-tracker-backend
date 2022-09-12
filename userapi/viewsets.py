@@ -31,6 +31,10 @@ class GetUsersDaysEvents(viewsets.ModelViewSet):
         timestamp = int(self.kwargs['timestamp'])
         return models.User.objects.get(userID = userID).events.all().filter(date__startswith =  str(datetime.fromtimestamp(timestamp).date()))
 
+class GetPostViewSet(viewsets.ModelViewSet):
+    queryset = models.Post.objects.order_by('-timestamp')
+    serializer_class = serializers.GetPostSerializer
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = models.Post.objects.order_by('-timestamp')
     serializer_class = serializers.PostSerializer
@@ -71,7 +75,7 @@ class GetUsersIdealData(viewsets.ModelViewSet):
 
     def get_queryset(self):
         userID = self.kwargs['userID']
-        return models.IdealData.objects.filter(userID__exact = userID)
+        return models.IdealData.objects.filter(user__exact = userID)
 
 class GetUsersPosts(viewsets.ModelViewSet):
     serializer_class = serializers.UserPostSerializer
