@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from .router import router
-from userapi.views import addComment, createTables, deleteComment, getLastWeekProductivity ,likeComment, likePost, unLikeComment, unLikePost
+from userapi.views import addComment, addEvent, createTables, deleteComment, getLastWeekProductivity, getUsersDaysEvents, likeComment, likePost, unLikeComment, unLikePost
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,6 +28,8 @@ urlpatterns = [
     re_path(r'api/addComment/', addComment, name = 'add_comment'),
     re_path(r'api/deleteComment/', deleteComment, name = 'delete_comment'),
     re_path(r'api/lastWeekProductivity/(?P<userID>\d+)/', getLastWeekProductivity, name = 'last_week_productivity'),
+    re_path(r'api/event/(?P<userID>\d+)/(?P<timestamp>\d+)/', getUsersDaysEvents, name = 'users_days_events'),
+    re_path(r'api/addEvent/', addEvent, name='add_event'),
     path('createTables/', createTables, name = 'create_tables'),
     path('api/', include(router.urls))
 ]
