@@ -23,7 +23,7 @@ class User(models.Model):
 
 class Event(models.Model):
     eventID = models.AutoField(primary_key=True)
-    users = models.ManyToManyField(User, related_name = 'events') # many-to-many: an event can be done by multiple users and a user can have multiple events
+    user = models.ForeignKey(User, related_name = 'events', on_delete=models.CASCADE) # change to many-to-many: an event can be done by multiple users and a user can have multiple events
     type = models.CharField(max_length = 50)
     title = models.CharField(max_length = 20)
     description = models.TextField()
@@ -31,8 +31,8 @@ class Event(models.Model):
     end_time = models.BigIntegerField()
     date = models.CharField(max_length = 10)
 
-    # class Meta:
-    #     unique_together = ['user', 'type', 'title', 'description', 'start_time', 'end_time', 'date']
+    class Meta:
+        unique_together = ['user', 'type', 'title', 'description', 'start_time', 'end_time', 'date']
 
 class Post(models.Model):
     postID = models.AutoField(primary_key=True)
