@@ -5,12 +5,224 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
 from userapi.models import Comment, CommentLikes, Event, Following, Post, PostLikes, Productivity, User
-from userapi.serializers import CommentLikesSerializer, CommentSerializer, PostSerializer
+from userapi.serializers import CommentLikesSerializer, CommentSerializer, EventSerializer, PostSerializer
 
+import sys
 import time
 import datetime
+from dateutil.tz import *
 import json
-# Create your views here.
+
+# import os.path
+# from google.oauth2.credentials import Credentials
+# from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events']
+
+# ASSUMES DESCRIPTION IS PRESENT AND ITS FIRST LINE IS type: <type>
+def calendar(date = None, event = None):
+    """Shows basic usage of the Google Calendar API.
+    Prints the start and name of the next 10 events on the user's calendar.
+    """
+    # creds = None
+    # # The file token.json stores the user's access and refresh tokens, and is
+    # # created automatically when the authorization flow completes for the first
+    # # time.
+    # if os.path.exists('token.json'):
+    #     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # # If there are no (valid) credentials available, let the user log in.
+    # if not creds or not creds.valid:
+    #     if creds and creds.expired and creds.refresh_token:
+    #         creds.refresh(Request())
+    #     else:
+    #         flow = InstalledAppFlow.from_client_secrets_file(
+    #             './client_secret_new.json', SCOPES)
+    #         creds = flow.run_local_server(port=0)
+    #     # Save the credentials for the next run
+    #     with open('token.json', 'w') as token:
+    #         token.write(creds.to_json())
+    
+    flow = InstalledAppFlow.from_client_secrets_file(
+                './client_secret_new.json', SCOPES)
+    creds = flow.run_local_server(port=0) # request login and calendar permissions from user
+
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+
+        if date is not None: # reading from dB
+            start_date = datetime.datetime(date.year, date.month, date.day, 00, 00, 00, 0).isoformat() + 'Z'
+            end_date = datetime.datetime(date.year, date.month, date.day, 23, 59, 59, 0).isoformat() + 'Z'
+
+            events_result = service.events().list(calendarId='primary', timeMin=start_date,
+                                                timeMax=end_date, singleEvents=True,
+                                                orderBy='startTime').execute()
+            events = events_result.get('items', [])
+
+            if not events:
+                print('No events found.')
+                return None
+
+            calendar_events = [] # list of events read from calendar
+            for event in events:
+                title = event['summary']
+                description = event['description'].split('\n')
+                type = description[0].split()[1]
+                desc = description[1]
+                for i in range(2, len(description)):
+                    desc += '\n'
+                    desc += description[i]
+                start_time = int(datetime.datetime.fromisoformat(event['start']['dateTime']).timestamp())
+                end_time = int(datetime.datetime.fromisoformat(event['end']['dateTime']).timestamp())
+                date = event['start']['dateTime'][:10]
+                calendar_events.append({
+                    "type": type,
+                    "title": title,
+                    "description": desc,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "date": date
+                })
+            print(calendar_events)
+            return calendar_events
+        
+        elif event is not None: # writing to dB
+            event = service.events().insert(calendarId='primary', body=event).execute()
+            print('Event created: %s' % (event.get('htmlLink')))
+
+    except HttpError as error:
+        print('An error occurred: %s' % error)
+        return None
+
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def getUsersDaysEvents(request, userID, timestamp):
+    if request.method == 'GET':
+        date = datetime.datetime.fromtimestamp(int(timestamp)).date()
+        calendar_events = calendar(date = date)
+        
+        if calendar_events is not None:
+            # add calendar_events to dB
+            for event in calendar_events:
+                try:
+                    # check if event is already added to dB
+                    event = Event.objects.filter(
+                        user_id__exact = userID,
+                        type__exact = event['type'],
+                        title__exact = event['title'],
+                        description__exact = event['description'],
+                        start_time__exact = event['start_time'],
+                        end_time__exact = event['end_time'],
+                        date__exact = event['date']
+                    )
+                    if len(event) == 0:
+                        # create a new event if it is not added to dB
+                        Event.objects.create(
+                            user_id = userID,
+                            type = event['type'],
+                            title = event['title'],
+                            description = event['description'],
+                            start_time = event['start_time'],
+                            end_time = event['end_time'],
+                            date = event['date']
+                        )
+                    else:
+                        print("Event already added!")
+                except:
+                    print("Whew!", sys.exc_info()[0], "occurred.")
+        
+        events = Event.objects.filter(user_id__exact = userID, date__exact = str(date))
+        
+        send = []
+        for event in events:
+            serializer = EventSerializer(event)
+            send.append(serializer.data)
+
+        return Response({"events": send})
+
+@api_view(('POST',))
+@renderer_classes((JSONRenderer,))
+def addEvent(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        try:
+            # check if event is already added to dB
+            event = Event.objects.filter(
+                    user_id__exact = body_data['userID'],
+                    type__exact = body_data['type'],
+                    title__exact = body_data['title'],
+                    description__exact = body_data['description'],
+                    start_time__exact = body_data['start_time'],
+                    end_time__exact = body_data['end_time'],
+                    date__exact = body_data['date']
+                )
+            if len(event) == 0:
+                # create event if it is not added to dB
+                event = Event.objects.create(
+                    user_id = body_data['userID'],
+                    type = body_data['type'],
+                    title = body_data['title'],
+                    description = body_data['description'],
+                    start_time = body_data['start_time'],
+                    end_time = body_data['end_time'],
+                    date = body_data['date']
+                )
+            else:
+                event = event[0]
+                print("Event already added!")
+        except:
+            print("Whew!", sys.exc_info()[0], "occurred.")
+            return Response({"error": str(sys.exc_info()[0])})
+        else:
+            # check if the event is already added in calendar
+            date = datetime.datetime.strptime(body_data['date'], '%Y-%m-%d').date()
+            print(date)
+            calendar_events = calendar(date = date)
+            exists = False
+            for evt in calendar_events:
+                if evt['type'] == body_data['type']:
+                    if evt['title'] == body_data['title']:
+                        if evt['description'] == body_data['description']:
+                            if evt['start_time'] == body_data['start_time']:
+                                if evt['end_time'] == body_data['end_time']:
+                                    if evt['date'] == body_data['date']:
+                                        exists = True
+                                        print("Already added to calendar!")
+                                        break
+            
+            if exists == False:
+                # create an event in calendar if not already done
+                start_dateTime = datetime.datetime.fromtimestamp(body_data['start_time'])
+                from_zone = tzutc()
+                to_zone = gettz('Asia/Kolkata')
+                start_dateTime.replace(tzinfo=from_zone)
+                start_dateTime = start_dateTime.astimezone(to_zone).isoformat()
+
+                end_dateTime = datetime.datetime.fromtimestamp(body_data['end_time'])
+                from_zone = tzutc()
+                to_zone = gettz('Asia/Kolkata')
+                end_dateTime.replace(tzinfo=from_zone)
+                end_dateTime = end_dateTime.astimezone(to_zone).isoformat()
+
+                event_data = {
+                    'summary': body_data['title'],
+                    'description': 'type: ' + body_data['type'] + '\n' + body_data['description'],
+                    'start': {
+                        'dateTime': start_dateTime,
+                        'timeZone': 'Asia/Kolkata',
+                    },
+                    'end': {
+                        'dateTime': end_dateTime,
+                        'timeZone': 'Asia/Kolkata',
+                    }
+                }
+
+                calendar(event = event_data)
+            serializer = EventSerializer(event)
+            return Response(serializer.data)
 
 @api_view(('GET',))
 @renderer_classes((JSONRenderer,))
@@ -220,6 +432,7 @@ def createTables(request):
             productivity.save()
 
         event1 = Event.objects.create(
+            user_id = user2.userID,
             type = "Exercise",
             title = "Gym",
             description = "Lifted weights for an hour",
@@ -227,10 +440,11 @@ def createTables(request):
             end_time = 1661392800,
             date = "2022-08-25",
         )
-        event1.users.set([user2.userID])
+        # event1.users.set([user2.userID])
         event1.save()
 
         event2 = Event.objects.create(
+            user_id = user4.userID,
             type = "Study",
             title = "Assignment",
             description = "Solved Math assignment",
@@ -238,10 +452,11 @@ def createTables(request):
             end_time = 1661403600,
             date = "2022-08-25",
         )
-        event2.users.set([user4.userID])
+        # event2.users.set([user4.userID])
         event2.save()
 
         event3 = Event.objects.create(
+            user_id = user1.userID,
             type = "Entertainment",
             title = "Netflix",
             description = "Watched 2 episodes of F.R.I.E.N.D.S",
@@ -249,10 +464,11 @@ def createTables(request):
             end_time = 1661363100,
             date = "2022-08-24",
         )
-        event3.users.set([user1.userID])
+        # event3.users.set([user1.userID])
         event3.save()
 
         event4 = Event.objects.create(
+            user_id = user3.userID,
             type = "Study",
             title = "Class",
             description = "Attended Compilers lecture",
@@ -260,10 +476,11 @@ def createTables(request):
             end_time = 1661397600,
             date = "2022-08-25",
         )
-        event4.users.set([user3.userID])
+        # event4.users.set([user3.userID])
         event4.save()
 
         event5 = Event.objects.create(
+            user_id = user1.userID,
             type = "Exercise",
             title = "Cycling",
             description = "Went for cycling around the campus",
@@ -271,10 +488,11 @@ def createTables(request):
             end_time = 1661349600,
             date = "2022-08-24",
         )
-        event5.users.set([user1.userID,user3.userID])
+        # event5.users.set([user1.userID,user3.userID])
         event5.save()
 
         event6 = Event.objects.create(
+            user_id = user2.userID,
             type = "Entertainment",
             title = "Movie",
             description = "Watched a movie in theater",
@@ -282,7 +500,7 @@ def createTables(request):
             end_time = 1661355000,
             date = "2022-08-24",
         )
-        event6.users.set([user2.userID,user4.userID])
+        # event6.users.set([user2.userID,user4.userID])
         event6.save()
 
         post1 = Post.objects.create(
