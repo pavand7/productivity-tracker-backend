@@ -182,16 +182,17 @@ def addEvent(request):
             print(date)
             calendar_events = calendar(date = date)
             exists = False
-            for evt in calendar_events:
-                if evt['type'] == body_data['type']:
-                    if evt['title'] == body_data['title']:
-                        if evt['description'] == body_data['description']:
-                            if evt['start_time'] == body_data['start_time']:
-                                if evt['end_time'] == body_data['end_time']:
-                                    if evt['date'] == body_data['date']:
-                                        exists = True
-                                        print("Already added to calendar!")
-                                        break
+            if calendar_events is not None:
+                for evt in calendar_events:
+                    if evt['type'] == body_data['type']:
+                        if evt['title'] == body_data['title']:
+                            if evt['description'] == body_data['description']:
+                                if evt['start_time'] == body_data['start_time']:
+                                    if evt['end_time'] == body_data['end_time']:
+                                        if evt['date'] == body_data['date']:
+                                            exists = True
+                                            print("Already added to calendar!")
+                                            break
             
             if exists == False:
                 # create an event in calendar if not already done
