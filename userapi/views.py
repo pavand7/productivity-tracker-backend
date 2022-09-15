@@ -108,7 +108,7 @@ def getUsersDaysEvents(request, userID, timestamp):
             for event in calendar_events:
                 try:
                     # check if event is already added to dB
-                    event = Event.objects.filter(
+                    evt = Event.objects.filter(
                         user_id__exact = userID,
                         type__exact = event['type'],
                         title__exact = event['title'],
@@ -117,7 +117,7 @@ def getUsersDaysEvents(request, userID, timestamp):
                         end_time__exact = event['end_time'],
                         date__exact = event['date']
                     )
-                    if len(event) == 0:
+                    if len(evt) == 0:
                         # create a new event if it is not added to dB
                         Event.objects.create(
                             user_id = userID,
