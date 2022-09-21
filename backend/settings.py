@@ -75,12 +75,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# all the fields are enclosed within single quotes
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'restfulapiDB',
-        'USER': 'saipavan',
-        'PASSWORD': 'apple',
+        'NAME': <name of the db created in pgadmin>,
+        'USER': <username of superuser>,
+        'PASSWORD': <password of superuser>,
         'HOST': 'localhost'
     }
 }
