@@ -49,6 +49,15 @@ The DATABASES variable should look like the following:
 
 `ALLOWED_HOSTS = ['10.0.2.2', 'localhost']`
 
+## CREATING A GOOGLE CLOUD PROJECT AND ENABLING GOOGLE CALENDAR API
+
+- Go to the Google Developers Console and create a Google Cloud Project by following [these](https://developers.google.com/workspace/guides/create-project) instructions.
+- Make sure you enable the Google Calendar API service.
+- After enabling the Calendar API service, make sure you add the following scopes to the OAuth Consent Screen.
+
+SCOPES: 'https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events'
+- Generate API keys and save the credentials file as 'client_secret_new.json' in the root folder of the project.
+
 ## RUNNING THE PROJECT
 
 - In the root directory, run ‘python manage.py runserver’ to start the server.
